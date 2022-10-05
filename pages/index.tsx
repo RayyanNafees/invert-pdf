@@ -49,6 +49,8 @@ export default function Home() {
           `.import-pdf-page-${index + 1} canvas`
         );
 
+        importPDFCanvas.getContext('2d').filter = 'invert(1)'
+
         pageIndex === index &&
           importPDFCanvas.toBlob((blob) => {
             setImageUrlArray((prev: string) => [
@@ -64,11 +66,11 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>PDF to IMG PNG</title>
+        <title>PDF Invert</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <main className={styles.main}>
-        <h1 className={styles.title}>PDF to PNG client-side conversion</h1>
+        <h1 className={styles.title}>PDF client-side inversion</h1>
         <label htmlFor="upload" className={styles.download}>
           Upload PDF
         </label>
@@ -123,7 +125,7 @@ export default function Home() {
             <div key={`page_${index + 1}`} className={styles.imageContainer}>
               <img className={styles.image} src={image} style={{filter:'invert(0)'}} />
               <a className={styles.download} href={image} download>
-                download filezila
+                download file
               </a>
             </div>
           ))}
