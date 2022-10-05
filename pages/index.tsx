@@ -121,9 +121,9 @@ export default function Home() {
           fileType === 'image' &&
           imageUrlArray.map((image: string, index: number) => (
             <div key={`page_${index + 1}`} className={styles.imageContainer}>
-              <img className={styles.image} src={image} />
+              <img className={styles.image} src={image} style={{filter:'invert(0)'}} />
               <a className={styles.download} href={image} download>
-                download file
+                download filezila
               </a>
             </div>
           ))}
