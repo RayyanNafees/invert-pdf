@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { Document, Page, pdfjs } from 'react-pdf';
-
+// import App from './sample';
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -44,6 +44,11 @@ export default function Home() {
 
   const onRenderSuccess = useCallback(
     (pageIndex) => {
+      const firstPDFslide: HTMLCanvasElement = document.querySelector(
+        `.import-pdf-page-1 canvas`
+      );
+      firstPDFslide.getContext('2d').filter = 'invert(1)';
+
       Array.from(new Array(numPages), (el, index) => {
         const importPDFCanvas: HTMLCanvasElement = document.querySelector(
           `.import-pdf-page-${index + 1} canvas`
@@ -123,13 +128,18 @@ export default function Home() {
           fileType === 'image' &&
           imageUrlArray.map((image: string, index: number) => (
             <div key={`page_${index + 1}`} className={styles.imageContainer}>
-              <img className={styles.image} src={image} style={{filter:'invert(0)'}} />
+              <img
+                className={styles.image}
+                src={image}
+                style={{ filter: 'invert(0)' }}
+              />
               <a className={styles.download} href={image} download>
                 download file
               </a>
             </div>
           ))}
       </main>
+      {/* <App /> */}
     </div>
   );
 }
