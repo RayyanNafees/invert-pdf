@@ -64,7 +64,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>PDF to PNG</title>
+        <title>PDF to IMG PNG</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <main className={styles.main}>
