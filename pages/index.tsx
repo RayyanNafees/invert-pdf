@@ -49,7 +49,7 @@ export default function Home() {
           `.import-pdf-page-${index + 1} canvas`
         );
 
-        importPDFCanvas.getContext('2d').filter = 'invert(1)'
+        importPDFCanvas.getContext('2d').filter = 'invert(1)';
 
         pageIndex === index &&
           importPDFCanvas.toBlob((blob) => {
@@ -59,6 +59,11 @@ export default function Home() {
             ]);
           });
       });
+      const _canvas: HTMLCanvasElement = document.querySelector(
+        `.import-pdf-page-1 canvas`
+      );
+
+      _canvas.getContext('2d').filter = 'invert(1)';
     },
     [numPages, setImageUrlArray, imageUrlArray]
   );
@@ -123,7 +128,11 @@ export default function Home() {
           fileType === 'image' &&
           imageUrlArray.map((image: string, index: number) => (
             <div key={`page_${index + 1}`} className={styles.imageContainer}>
-              <img className={styles.image} src={image} style={{filter:'invert(0)'}} />
+              <img
+                className={styles.image}
+                src={image}
+                style={{ filter: 'invert(0)' }}
+              />
               <a className={styles.download} href={image} download>
                 download file
               </a>

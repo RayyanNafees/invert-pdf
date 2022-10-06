@@ -487,6 +487,11 @@ convert-source-map@1.7.0:
   dependencies:
     safe-buffer "~5.1.1"
 
+convertapi-js@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/convertapi-js/-/convertapi-js-1.0.8.tgz#6038ca00145c6485e5fca91ce24509537f66c493"
+  integrity sha512-iuwiXXyUEL4MqQgW7j/wRkxtaN4QrY1D9P/XEcumTHOEUSgvUe7idzvmDxAP+6eO+ZJ4FHQmZ8D9wjKDPy08bg==
+
 core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"

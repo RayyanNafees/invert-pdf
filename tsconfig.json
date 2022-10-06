@@ -15,6 +15,6 @@
     "jsx": "preserve",
     "strictNullChecks": false
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api.js"],
   "exclude": ["node_modules"]
 }
