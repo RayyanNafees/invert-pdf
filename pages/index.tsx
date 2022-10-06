@@ -1,8 +1,9 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { Document, Page, pdfjs } from 'react-pdf';
-// import App from './sample';
+import { generatePdfFromImages } from './sample';
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -54,7 +55,7 @@ export default function Home() {
           `.import-pdf-page-${index + 1} canvas`
         );
 
-        importPDFCanvas.getContext('2d').filter = 'invert(1)'
+        importPDFCanvas.getContext('2d').filter = 'invert(1)';
 
         pageIndex === index &&
           importPDFCanvas.toBlob((blob) => {
@@ -133,13 +134,19 @@ export default function Home() {
                 src={image}
                 style={{ filter: 'invert(0)' }}
               />
-              <a className={styles.download} href={image} download>
-                download file
-              </a>
             </div>
           ))}
       </main>
-      {/* <App /> */}
+      <a
+        className={styles.download}
+        onClick={(e) => {
+          e.preventDefault();
+          generatePdfFromImages(imageUrlArray);
+        }}
+        download
+      >
+        download file
+      </a>
     </div>
   );
 }
