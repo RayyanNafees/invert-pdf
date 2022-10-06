@@ -6,12 +6,17 @@ import jsPDF from 'jspdf';
 
 const doc = new jsPDF('l', 'px', 'a4');
 
-
 const Progress = React.memo(function Progress(props: any) {
-return ( <div>
-  {props.isLoading === false &&
-    `${props.status} ${props.status !=='Inversion Complete!' && props.progress<101? `(${props.progress}%)`:''}`}
-</div>)
+  return (
+    <div>
+      {props.isLoading === false &&
+        `${props.status} ${
+          props.status !== 'Inversion Complete!' && props.progress < 101
+            ? `(${props.progress}%)`
+            : ''
+        }`}
+    </div>
+  );
 });
 
 export default function Home() {
@@ -119,8 +124,8 @@ export default function Home() {
 
         setSteps((s) => 1 + s);
       }
-      setStatus('Inversion Complete!')
-      setSteps(numPages)
+      setStatus('Inversion Complete!');
+      setSteps(numPages);
 
       setSteps(1 + steps);
 
@@ -133,6 +138,10 @@ export default function Home() {
       doc.save('inverted.pdf');
       setSteps(1 + steps);
 
+      setSteps(0);
+      setStatus('');
+      setIsLoading(null);
+      // }, 1000);
       // alert([ count, numPages, count/numPages, steps]);
     }
   }, [imageUrlArray, numPages, selectedPDFFile, setIsLoading, setSteps]);
@@ -192,7 +201,13 @@ export default function Home() {
             </Document>
           </div>
         )}
-        <Progress progress={parseInt(String((steps / (numPages-4)) * 100))} isLoading={isLoading} status={status} />
+        {steps ? (
+          <Progress
+            progress={parseInt(String((steps / (numPages - 4)) * 100))}
+            isLoading={isLoading}
+            status={status}
+          />
+        ) : null}
       </main>
     </div>
   );
