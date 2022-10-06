@@ -6,20 +6,33 @@ import jsPDF from 'jspdf';
 
 const doc = new jsPDF('l', 'px', 'a4');
 
+
+const Progress = React.memo(function Progress(props: any) {
+return ( <div>
+  {props.isLoading === false &&
+    `${props.status} ${props.status !=='Inversion Complete!' && props.progress<101? `(${props.progress}%)`:''}`}
+</div>)
+});
+
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [imageUrlArray, setImageUrlArray] = useState(null);
   const [fileType, setFileType] = useState(null);
   const [selectedPDFFile, setSelectedPDFFile] = useState();
   const [heights, setHeights] = useState([]);
+  const [steps, setSteps] = useState(0);
+  const [status, setStatus] = useState('');
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
   const handleImage = useCallback(
     (event: any) => {
+      setStatus('Loading');
       setImageUrlArray([]);
       const file = event.target.files[0];
+
+      setSteps(1 + steps);
 
       if (!!file?.type?.length && file.type === 'application/pdf') {
         setIsLoading(true);
@@ -28,6 +41,8 @@ export default function Home() {
         setFileType('image');
         setImageUrlArray([URL.createObjectURL(file).toString()]);
       }
+
+      setSteps(1 + steps);
     },
     [
       setSelectedPDFFile,
@@ -40,18 +55,26 @@ export default function Home() {
 
   const onLoadSuccess = useCallback(
     ({ numPages }: { numPages: number }) => {
+      setStatus('Rendering');
       setNumPages(numPages);
       setIsLoading(false);
+
+      setSteps(1 + steps);
     },
     [setNumPages, numPages, setIsLoading]
   );
 
   const onRenderSuccess = useCallback(
     (pageIndex) => {
+      setStatus('Inverting');
+      setSteps(1 + steps);
+
       Array.from(new Array(numPages), (el, index) => {
         const importPDFCanvas: HTMLCanvasElement = document.querySelector(
           `.import-pdf-page-${index + 1} canvas`
         );
+
+        setSteps(1 + steps);
 
         importPDFCanvas.getContext('2d').filter = 'invert(1)';
 
@@ -62,6 +85,9 @@ export default function Home() {
               URL.createObjectURL(blob),
             ]);
           });
+
+          setSteps(1 + steps);
+
           setHeights((h) =>
             h.concat({
               height: importPDFCanvas.height,
@@ -77,16 +103,39 @@ export default function Home() {
   useMemo(() => {
     const f: number = 1.4;
     if (Array.isArray(imageUrlArray) && imageUrlArray?.length == numPages) {
-      for (const img of imageUrlArray) {
-        const dimnsn = heights[imageUrlArray.indexOf(img)];
-        doc.addImage(img, 'PNG', 0, 0, dimnsn.width/f, dimnsn.height/f);
-        doc.addPage([dimnsn.width/f, dimnsn.height/f], 'l');
+      setStatus('Downloading');
+
+      for (let i = 0; i < imageUrlArray.length; i++) {
+        const dimnsn = heights[i];
+        doc.addImage(
+          imageUrlArray[i],
+          'PNG',
+          0,
+          0,
+          dimnsn.width / f,
+          dimnsn.height / f
+        );
+        doc.addPage([dimnsn.width / f, dimnsn.height / f], 'l');
+
+        setSteps((s) => 1 + s);
       }
-      console.log(heights);
-      doc.deletePage(0)
-      doc.deletePage(imageUrlArray.length - 1);
+      setStatus('Inversion Complete!')
+      setSteps(numPages)
+
+      setSteps(1 + steps);
+
+      doc.deletePage(0);
+      setSteps(1 + steps);
+
+      doc.deletePage(numPages - 2);
+      setSteps(1 + steps);
+
+      doc.save('inverted.pdf');
+      setSteps(1 + steps);
+
+      // alert([ count, numPages, count/numPages, steps]);
     }
-  }, [imageUrlArray, numPages, selectedPDFFile]);
+  }, [imageUrlArray, numPages, selectedPDFFile, setIsLoading, setSteps]);
 
   return (
     <div className={styles.container}>
@@ -143,30 +192,8 @@ export default function Home() {
             </Document>
           </div>
         )}
-
-        {!!imageUrlArray?.length &&
-          fileType === 'image' &&
-          imageUrlArray.map((image: string, index: number) => (
-            <div key={`page_${index + 1}`} className={styles.imageContainer}>
-              <img
-                className={styles.image}
-                src={image}
-              />
-            </div>
-          ))}
+        <Progress progress={parseInt(String((steps / (numPages-4)) * 100))} isLoading={isLoading} status={status} />
       </main>
-      {imageUrlArray?.length && (
-        <a
-          className={styles.download}
-          onClick={(e) => {
-            e.preventDefault();
-            doc.save('file.pdf');
-          }}
-          download
-        >
-          download file
-        </a>
-      )}
     </div>
   );
 }
