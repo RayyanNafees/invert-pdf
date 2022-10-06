@@ -12,6 +12,7 @@ export default function Home() {
   const [imageUrlArray, setImageUrlArray] = useState(null);
   const [fileType, setFileType] = useState(null);
   const [selectedPDFFile, setSelectedPDFFile] = useState();
+  const [heights, setHeights] = useState([]);
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -47,11 +48,6 @@ export default function Home() {
 
   const onRenderSuccess = useCallback(
     (pageIndex) => {
-      const firstPDFslide: HTMLCanvasElement = document.querySelector(
-        `.import-pdf-page-1 canvas`
-      );
-      firstPDFslide.getContext('2d').filter = 'invert(1)';
-
       Array.from(new Array(numPages), (el, index) => {
         const importPDFCanvas: HTMLCanvasElement = document.querySelector(
           `.import-pdf-page-${index + 1} canvas`
@@ -59,27 +55,36 @@ export default function Home() {
 
         importPDFCanvas.getContext('2d').filter = 'invert(1)';
 
-        pageIndex === index &&
+        if (pageIndex === index) {
           importPDFCanvas.toBlob((blob) => {
             setImageUrlArray((prev: string) => [
               ...prev,
               URL.createObjectURL(blob),
             ]);
           });
+          setHeights((h) =>
+            h.concat({
+              height: importPDFCanvas.height,
+              width: importPDFCanvas.width,
+            })
+          );
+        }
       });
     },
-    [numPages, setImageUrlArray, imageUrlArray]
+    [numPages, setImageUrlArray, imageUrlArray, setHeights]
   );
 
   useMemo(() => {
     if (Array.isArray(imageUrlArray) && imageUrlArray?.length == numPages) {
       for (const img of imageUrlArray) {
-        doc.addImage(img, 'PNG', 0, 0, 631, 355);
-        doc.addPage();
+        const dimnsn = heights[imageUrlArray.indexOf(img)];
+        doc.addImage(img, 'PNG', 0, 0, dimnsn.width, dimnsn.height);
+        doc.addPage([dimnsn.width, dimnsn.height], 'l');
       }
+      console.log(heights);
       doc.deletePage(imageUrlArray.length - 1);
     }
-  }, [imageUrlArray, numPages]);
+  }, [imageUrlArray, numPages, selectedPDFFile]);
 
   return (
     <div className={styles.container}>
@@ -144,7 +149,6 @@ export default function Home() {
               <img
                 className={styles.image}
                 src={image}
-                style={{ filter: 'invert(0)' }}
               />
             </div>
           ))}
