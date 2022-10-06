@@ -75,13 +75,15 @@ export default function Home() {
   );
 
   useMemo(() => {
+    const f: number = 2;
     if (Array.isArray(imageUrlArray) && imageUrlArray?.length == numPages) {
       for (const img of imageUrlArray) {
         const dimnsn = heights[imageUrlArray.indexOf(img)];
-        doc.addImage(img, 'PNG', 0, 0, dimnsn.width, dimnsn.height);
-        doc.addPage([dimnsn.width, dimnsn.height], 'l');
+        doc.addImage(img, 'PNG', 0, 0, dimnsn.width/f, dimnsn.height/f);
+        doc.addPage([dimnsn.width/f, dimnsn.height/f], 'l');
       }
       console.log(heights);
+      doc.deletePage(0)
       doc.deletePage(imageUrlArray.length - 1);
     }
   }, [imageUrlArray, numPages, selectedPDFFile]);
