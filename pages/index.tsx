@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -71,12 +71,14 @@ export default function Home() {
     [numPages, setImageUrlArray, imageUrlArray]
   );
 
-  useEffect(() => {
-    if (imageUrlArray?.length == numPages)
+  useMemo(() => {
+    if (Array.isArray(imageUrlArray) && imageUrlArray?.length == numPages) {
       for (const img of imageUrlArray) {
         doc.addImage(img, 'PNG', 0, 0, 631, 355);
         doc.addPage();
       }
+      doc.deletePage(imageUrlArray.length - 1);
+    }
   }, [imageUrlArray, numPages]);
 
   return (
