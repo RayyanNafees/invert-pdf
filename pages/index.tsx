@@ -75,7 +75,7 @@ export default function Home() {
   );
 
   useMemo(() => {
-    const f: number = 1.6;
+    const f: number = 1.4;
     if (Array.isArray(imageUrlArray) && imageUrlArray?.length == numPages) {
       for (const img of imageUrlArray) {
         const dimnsn = heights[imageUrlArray.indexOf(img)];
