@@ -1,8 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { generatePdfFromImages } from './sample';
+import jsPDF from 'jspdf';
+
+const doc = new jsPDF('l', 'px', 'a4');
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +70,14 @@ export default function Home() {
     },
     [numPages, setImageUrlArray, imageUrlArray]
   );
+
+  useEffect(() => {
+    if (imageUrlArray?.length == numPages)
+      for (const img of imageUrlArray) {
+        doc.addImage(img, 'PNG', 0, 0, 631, 355);
+        doc.addPage();
+      }
+  }, [imageUrlArray, numPages]);
 
   return (
     <div className={styles.container}>
@@ -137,16 +147,18 @@ export default function Home() {
             </div>
           ))}
       </main>
-      <a
-        className={styles.download}
-        onClick={(e) => {
-          e.preventDefault();
-          generatePdfFromImages(imageUrlArray);
-        }}
-        download
-      >
-        download file
-      </a>
+      {imageUrlArray?.length && (
+        <a
+          className={styles.download}
+          onClick={(e) => {
+            e.preventDefault();
+            doc.save('file.pdf');
+          }}
+          download
+        >
+          download file
+        </a>
+      )}
     </div>
   );
 }
